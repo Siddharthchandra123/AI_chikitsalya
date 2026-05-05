@@ -15,6 +15,36 @@ import {
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import * as Location from 'expo-location';
 
+// Hospital Card Component - Moved outside to prevent re-creation
+const HospitalCard = ({ item }) => (
+  <View style={styles.card}>
+    <View style={styles.cardHeader}>
+      <View style={styles.iconBox}><Text style={{fontSize: 20}}>{item.icon || '🏥'}</Text></View>
+      <View style={{ flex: 1 }}>
+        <Text style={styles.cardTitle}>{item.name}</Text>
+        <Text style={styles.cardAddress}>{item.address}</Text>
+      </View>
+      <View style={styles.categoryBadge}><Text style={styles.categoryText}>{item.category}</Text></View>
+    </View>
+    <View style={styles.cardActions}>
+      {item.phone ? (
+        <TouchableOpacity 
+          style={styles.actionBtnCall} 
+          onPress={() => Linking.openURL(`tel:${item.phone}`)}
+        >
+          <Text style={styles.btnText}>📞 Call</Text>
+        </TouchableOpacity>
+      ) : null}
+      <TouchableOpacity 
+        style={styles.actionBtnNav} 
+        onPress={() => Linking.openURL(`https://maps.google.com/?q=${item.lat},${item.lon}`)}
+      >
+        <Text style={styles.btnText}>🗺️ Nav</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+);
+
 export default function App() {
   // Use your backend endpoint as before
   const BACKEND_URL = 'https://chikitsalya-backend.onrender.com/rag'; 
@@ -23,32 +53,46 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('assistant'); // 'assistant' or 'hospitals'
   const [loading, setLoading] = useState(false);
   const [location, setLocation] = useState(null);
+  const [error, setError] = useState('');
 
   // Assistant State (Preserved logic)
   const [query, setQuery] = useState('');
   const [answer, setAnswer] = useState('');
+  const [assistantLoading, setAssistantLoading] = useState(false);
 
   // Hospital State
   const [hospitals, setHospitals] = useState([]);
   const [filteredHospitals, setFilteredHospitals] = useState([]);
   const [filter, setFilter] = useState('All');
+  const [hospitalsLoading, setHospitalsLoading] = useState(true);
 
   // Initialize Location & Fetch Hospitals
   useEffect(() => {
     (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') return;
+      try {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          setError('Location permission not granted');
+          setHospitalsLoading(false);
+          return;
+        }
 
-      const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
-      setLocation(loc);
-      fetchHospitals(loc.coords.latitude, loc.coords.longitude);
+        const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+        setLocation(loc);
+        fetchHospitals(loc.coords.latitude, loc.coords.longitude);
+      } catch (err) {
+        console.error('Location error:', err);
+        setError('Failed to get location');
+        setHospitalsLoading(false);
+      }
     })();
   }, []);
 
   // --- PREDICTION MODEL (Untouched Logic) ---
   const handleQuery = async () => {
     if (!query.trim()) return;
-    setLoading(true);
+    setAssistantLoading(true);
+    setError('');
     try {
       // Exactly as you provided (sending { query }, reading data.answer)
       const response = await fetch(BACKEND_URL, {
@@ -56,26 +100,50 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query }), 
       });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
       setAnswer(data.answer || 'No response from backend');
     } catch (error) {
-      console.error(error);
-      setAnswer('Error connecting to backend');
+      console.error('API Error:', error);
+      setAnswer('');
+      setError('Error connecting to backend. Please try again.');
     } finally {
-      setLoading(false);
+      setAssistantLoading(false);
     }
   };
 
   // Fetch Nearby Hospitals
   const fetchHospitals = async (lat, lon) => {
     try {
+      setHospitalsLoading(true);
       const res = await fetch(`${HOSPITAL_API}?lat=${lat}&lon=${lon}`);
+      
+      if (!res.ok) {
+        throw new Error(`Failed to fetch hospitals: ${res.status}`);
+      }
+      
       const data = await res.json();
+      
+      // Validate data is an array
+      if (!Array.isArray(data)) {
+        throw new Error('Invalid response format');
+      }
+      
       const classified = data.map(h => classifyByName(h));
       setHospitals(classified);
       setFilteredHospitals(classified);
+      setError('');
     } catch (err) {
       console.log("Hospital fetch error:", err);
+      setError(`Could not load hospitals: ${err.message}`);
+      setHospitals([]);
+      setFilteredHospitals([]);
+    } finally {
+      setHospitalsLoading(false);
     }
   };
 
@@ -115,35 +183,8 @@ export default function App() {
     }
   };
 
-  // Hospital Card Component
-  const HospitalCard = ({ item }) => (
-    <View style={styles.card}>
-      <View style={styles.cardHeader}>
-        <View style={styles.iconBox}><Text style={{fontSize: 20}}>{item.icon || '🏥'}</Text></View>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.cardTitle}>{item.name}</Text>
-          <Text style={styles.cardAddress}>{item.address}</Text>
-        </View>
-        <View style={styles.categoryBadge}><Text style={styles.categoryText}>{item.category}</Text></View>
-      </View>
-      <View style={styles.cardActions}>
-        {item.phone ? (
-          <TouchableOpacity 
-            style={styles.actionBtnCall} 
-            onPress={() => Linking.openURL(`tel:${item.phone}`)}
-          >
-            <Text style={styles.btnText}>📞 Call</Text>
-          </TouchableOpacity>
-        ) : null}
-        <TouchableOpacity 
-          style={styles.actionBtnNav} 
-          onPress={() => Linking.openURL(`https://maps.google.com/?q=${item.lat},${item.lon}`)}
-        >
-          <Text style={styles.btnText}>🗺️ Nav</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
+  // Render hospital card function for FlatList
+  const renderHospitalCard = ({ item }) => <HospitalCard item={item} />;
 
   return (
     <SafeAreaProvider>
@@ -173,6 +214,13 @@ export default function App() {
           </TouchableOpacity>
         </View>
 
+        {/* Error Message Display */}
+        {error ? (
+          <View style={styles.errorBox}>
+            <Text style={styles.errorText}>⚠️ {error}</Text>
+          </View>
+        ) : null}
+
         {/* Dynamic Content */}
         <View style={{ flex: 1 }}>
           {activeTab === 'assistant' ? (
@@ -187,8 +235,8 @@ export default function App() {
                   onChangeText={setQuery}
                   multiline
                 />
-                <TouchableOpacity style={styles.predictBtn} onPress={handleQuery} disabled={loading}>
-                  {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.btnTextMain}>Submit 🧠</Text>}
+                <TouchableOpacity style={styles.predictBtn} onPress={handleQuery} disabled={assistantLoading}>
+                  {assistantLoading ? <ActivityIndicator color="#fff" /> : <Text style={styles.btnTextMain}>Submit 🧠</Text>}
                 </TouchableOpacity>
               </View>
 
@@ -224,12 +272,14 @@ export default function App() {
 
               <FlatList
                 data={filteredHospitals}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={HospitalCard}
+                keyExtractor={(item, index) => `hospital-${index}`}
+                renderItem={renderHospitalCard}
                 contentContainerStyle={{ padding: 15 }}
                 ListEmptyComponent={() => (
                   <View style={styles.emptyBox}>
-                    <Text style={styles.emptyText}>Searching for medical facilities... 📡</Text>
+                    <Text style={styles.emptyText}>
+                      {hospitalsLoading ? 'Searching for medical facilities... 📡' : 'No hospitals found in your area'}
+                    </Text>
                   </View>
                 )}
               />
@@ -254,6 +304,9 @@ const styles = StyleSheet.create({
   activeTab: { backgroundColor: '#0ea5e9' },
   tabText: { color: '#94a3b8', fontWeight: '600' },
   activeTabText: { color: '#fff' },
+
+  errorBox: { backgroundColor: '#7f1d1d', marginHorizontal: 15, marginVertical: 10, padding: 12, borderRadius: 8, borderLeftWidth: 4, borderLeftColor: '#dc2626' },
+  errorText: { color: '#fca5a5', fontSize: 13, fontWeight: '500' },
 
   content: { padding: 20 },
   label: { color: '#94a3b8', fontSize: 14, marginBottom: 8, fontWeight: '500' },
