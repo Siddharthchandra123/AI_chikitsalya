@@ -43,16 +43,12 @@ export async function GET(request: Request) {
     }
 
     try {
-        // 2. Fetch Live OSM Data
+        // 2. Fetch Live OSM Data (Optimized search)
         const overpassQuery = `
-            [out:json][timeout:25];
+            [out:json][timeout:15];
             (
-              node(around:50000,${lat},${lon})["amenity"~"hospital|clinic|doctors|dentist"];
-              node(around:50000,${lat},${lon})["healthcare"~"hospital|clinic|centre|dentist|surgeon"];
-              node(around:50000,${lat},${lon})["name"~"Hospital|Clinic|Nursing Home|PHC|CHC|Health|Medical",i];
-              way(around:50000,${lat},${lon})["amenity"~"hospital|clinic|doctors|dentist"];
-              way(around:50000,${lat},${lon})["healthcare"~"hospital|clinic|centre|dentist|surgeon"];
-              way(around:50000,${lat},${lon})["name"~"Hospital|Clinic|Nursing Home|PHC|CHC|Health|Medical",i];
+              node(around:15000,${lat},${lon})["amenity"~"hospital|clinic"];
+              way(around:15000,${lat},${lon})["amenity"~"hospital|clinic"];
             );
             out center;
         `;
@@ -61,11 +57,12 @@ export async function GET(request: Request) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
-                'User-Agent': 'AI-Chikitsalya-NextJS/1.0'
+                'User-Agent': 'AI-Chikitsalya-NextJS/1.1'
             },
             body: `data=${encodeURIComponent(overpassQuery)}`,
-            signal: AbortSignal.timeout(30000)
+            signal: AbortSignal.timeout(15000)
         });
+
 
         if (response.ok) {
             const data = await response.json();

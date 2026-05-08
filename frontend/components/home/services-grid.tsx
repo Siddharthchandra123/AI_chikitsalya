@@ -13,6 +13,8 @@ import {
   UserCheck,
   Bus,
   Plane,
+  LogOut,
+  PackageOpen,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useLanguage } from "@/lib/language-context";
@@ -63,6 +65,13 @@ export function ServicesGrid() {
       icon: ShoppingBag,
       href: "/pharmacy",
       color: "bg-success/10 text-success",
+    },
+    {
+      title: t("patientDischarge"),
+      description: t("patientDischargeDesc"),
+      icon: PackageOpen,
+      href: "/discharge-dashboard/login",
+      color: "bg-primary/10 text-primary",
     },
   ];
 

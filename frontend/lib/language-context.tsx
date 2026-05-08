@@ -57,6 +57,8 @@ export const translations: Record<Language, Record<string, string>> = {
     doctorsDesc: "Browse detailed profiles of qualified doctors across specializations.",
     medicalShops: "Medical Shops",
     pharmacyDesc: "Locate pharmacies near you with medicine availability and pricing.",
+    patientDischarge: "Patient Discharge",
+    patientDischargeDesc: "Manage and track the complete patient discharge process efficiently.",
     
     // Stats
     patientsServed: "Patients Served",
@@ -215,6 +217,8 @@ export const translations: Record<Language, Record<string, string>> = {
     doctorsDesc: "विभिन्न विशेषज्ञताओं में योग्य डॉक्टरों की प्रोफाइल देखें।",
     medicalShops: "मेडिकल दुकानें",
     pharmacyDesc: "अपने पास दवाखाने खोजें और दवाओं की उपलब्धता जांचें।",
+    patientDischarge: "मरीज डिस्चार्ज",
+    patientDischargeDesc: "मरीज की छुट्टी की पूरी प्रक्रिया को कुशलतापूर्वक प्रबंधित और ट्रैक करें।",
     
     // Stats
     patientsServed: "मरीजों की सेवा",
@@ -372,6 +376,8 @@ export const translations: Record<Language, Record<string, string>> = {
     doctorProfiles: "ডাক্তার প্রোফাইল",
     doctorsDesc: "বিভিন্ন বিশেষজ্ঞতায় যোগ্য ডাক্তারদের প্রোফাইল দেখুন।",
     medicalShops: "মেডিকেল দোকান",
+    patientDischarge: "রোগী ডিসচার্জ",
+    patientDischargeDesc: "রোগীর ডিসচার্জের সম্পূর্ণ প্রক্রিয়াটি দক্ষতার સાથે পরিচালনা এবং ট্র্যাক করুন।",
     pharmacyDesc: "আপনার কাছে ফার্মেসি খুঁজুন এবং ওষুধের প্রাপ্যতা পরীক্ষা করুন।",
     
     // Stats
@@ -526,6 +532,8 @@ export const translations: Record<Language, Record<string, string>> = {
     doctorsDesc: "பல்வேறு நிபுணத்துவங்களில் தகுதியான மருத்துவர்களின் சுயவிவரங்களை பார்க்கவும்.",
     medicalShops: "மருந்து கடைகள்",
     pharmacyDesc: "உங்கள் அருகில் மருந்தகங்களை கண்டறிந்து மருந்துகளின் கிடைக்கும்நிலையை சரிபார்க்கவும்.",
+    patientDischarge: "நோயாளி வெளியேற்றம்",
+    patientDischargeDesc: "நோயாளி வெளியேற்ற செயல்முறையை திறமையாக நிர்வகிக்கவும் மற்றும் கண்காணிக்கவும்.",
     patientsServed: "சேவை செய்யப்பட்ட நோயாளிகள்",
     expertDoctors: "நிபுணர் மருத்துவர்கள்",
     partnerHospitals: "கூட்டாளி மருத்துவமனைகள்",
@@ -654,6 +662,8 @@ export const translations: Record<Language, Record<string, string>> = {
     doctorProfiles: "డాక్టర్ ప్రొఫైల్స్",
     doctorsDesc: "వివిధ స్పెషలైజేషన్లలో అర్హత కలిగిన డాక్టర్ల ప్రొఫైల్‌లను చూడండి.",
     medicalShops: "మెడికల్ షాపులు",
+    patientDischarge: "రోగి డిశ్చార్జ్",
+    patientDischargeDesc: "రోగి డిశ్చార్జ్ ప్రక్రియను సమర్థవంతంగా నిర్వహించండి మరియు ట్రాక్ చేయండి.",
     pharmacyDesc: "మీ సమీపంలో ఫార్మసీలను కనుగొని మందుల లభ్యతను తనిఖీ చేయండి.",
     patientsServed: "సేవలు పొందిన రోగులు",
     expertDoctors: "నిపుణ వైద్యులు",
@@ -784,6 +794,8 @@ export const translations: Record<Language, Record<string, string>> = {
     doctorsDesc: "विविध विशेषज्ञतांमध्ये पात्र डॉक्टरांचे प्रोफाइल पहा.",
     medicalShops: "वैद्यकीय दुकाने",
     pharmacyDesc: "तुमच्या जवळ औषधालये शोधा आणि औषधांची उपलब्धता तपासा.",
+    patientDischarge: "रुग्ण डिस्चार्ज",
+    patientDischargeDesc: "रुग्णाच्या डिस्चार्जची संपूर्ण प्रक्रिया कार्यक्षमतेने व्यवस्थापित करा आणि ट्रॅक करा.",
     patientsServed: "सेवा दिलेले रुग्ण",
     expertDoctors: "तज्ञ डॉक्टर",
     partnerHospitals: "भागीदार रुग्णालये",
@@ -913,6 +925,8 @@ export const translations: Record<Language, Record<string, string>> = {
     doctorsDesc: "વિવિધ વિશેષતાઓમાં લાયક ડોક્ટરોની પ્રોફાઇલ જુઓ.",
     medicalShops: "મેડિકલ દુકાનો",
     pharmacyDesc: "તમારી નજીક ફાર્મસી શોધો અને દવાઓની ઉપલબ્ધતા તપાસો.",
+    patientDischarge: "દર્દી ડિસ્ચાર્જ",
+    patientDischargeDesc: "દર્દીના ડિસ્ચાર્જની સંપૂર્ણ પ્રક્રિયાને કાર્યક્ષમ રીતે સંચાલિત અને ટ્રેક કરો.",
     patientsServed: "સેવા આપેલ દર્દીઓ",
     expertDoctors: "નિષ્ણાત ડોક્ટરો",
     partnerHospitals: "ભાગીદાર હોસ્પિટલો",

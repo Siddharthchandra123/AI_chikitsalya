@@ -22,20 +22,27 @@ const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { 
 const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false });
 
 import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
 
-// Fix for default marker icons in Leaflet + Next.js
-const ambulanceIcon = typeof window !== 'undefined' ? L.icon({
-  iconUrl: 'https://cdn-icons-png.flaticon.com/512/3448/3448327.png',
-  iconSize: [40, 40],
-  iconAnchor: [20, 40],
-}) : null;
+// Lazy load Leaflet to avoid SSR issues
+let L: any = null;
+let ambulanceIcon: any = null;
+let userIcon: any = null;
 
-const userIcon = typeof window !== 'undefined' ? L.icon({
-  iconUrl: 'https://cdn-icons-png.flaticon.com/512/10421/10421771.png',
-  iconSize: [40, 40],
-  iconAnchor: [20, 40],
-}) : null;
+const initLeafletIcons = () => {
+  if (typeof window !== 'undefined' && !L) {
+    L = require('leaflet');
+    ambulanceIcon = L.icon({
+      iconUrl: 'https://cdn-icons-png.flaticon.com/512/3448/3448327.png',
+      iconSize: [40, 40],
+      iconAnchor: [20, 40],
+    });
+    userIcon = L.icon({
+      iconUrl: 'https://cdn-icons-png.flaticon.com/512/10421/10421771.png',
+      iconSize: [40, 40],
+      iconAnchor: [20, 40],
+    });
+  }
+};
 
 
 const ambulances = [
@@ -79,6 +86,10 @@ export default function AmbulancePage() {
   const [countdown, setCountdown] = useState(0);
   const [ambulancePos, setAmbulancePos] = useState<[number, number]>([28.6139, 77.2090]); // Delhi Start
   const [userPos, setUserPos] = useState<[number, number]>([28.6239, 77.2190]); // Near Delhi
+
+  useEffect(() => {
+    initLeafletIcons();
+  }, []);
 
   useEffect(() => {
     if (bookingStatus === "assigned" && countdown > 0) {
