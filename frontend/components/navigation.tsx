@@ -46,6 +46,7 @@ export function Navigation() {
     { href: "/hospitals", label: t("hospitals"), icon: MapPin },
     { href: "/doctors", label: t("doctors"), icon: Users },
     { href: "/pharmacy", label: t("pharmacy"), icon: ShoppingBag },
+    { href: "/discharge-dashboard", label: "Discharge Dashboard", icon: Heart },
   ];
 
   const currentLang = languages.find((l) => l.code === language);
