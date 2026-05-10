@@ -1,5 +1,6 @@
 "use client"
 
+import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { Settings, User, Bell, Shield, Wallet, Globe, LogOut, HelpCircle, ChevronRight, Moon, Sun } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -8,14 +9,19 @@ import { Switch } from "@/components/ui/switch"
 import { Separator } from "@/components/ui/separator"
 import { useTheme } from "@/components/theme-provider"
 import { toast } from "sonner"
+import { useAuth } from "@/lib/auth-context"
 
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme()
+  const router = useRouter()
+  const { logout } = useAuth()
 
   const handleSignOut = () => {
+    logout()
     toast.warning("Signing Out", {
       description: "Redirecting to login page...",
     })
+    router.push("/discharge-dashboard/login")
   }
 
   const handleSupport = () => {

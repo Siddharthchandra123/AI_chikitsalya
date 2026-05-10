@@ -1,6 +1,6 @@
 # 🏥 Chikitsalya — AI-Powered Rural Telehealth & Clinical Decision Support
 
-![Chikitsalya Hero Banner](./local_host/public/images/hero.png)
+![Chikitsalya Hero Banner](./backend/public/images/hero.png)
 
 ## 🌍 Overview
 **Chikitsalya** is a state-of-the-art AI-driven medical assistance platform engineered for rural accessibility, early diagnosis, and clinical decision support. It bridges the gap between underserved communities and quality healthcare through advanced machine learning and real-time medical knowledge retrieval.
@@ -23,7 +23,7 @@ Healthcare in rural areas faces critical challenges:
 Using a high-accuracy **Random Forest Classifier**, Chikitsalya predicts potential conditions based on patient-reported symptoms, providing a confidence score to aid triage.
 
 ### 📚 Medical Knowledge RAG (Retrieval-Augmented Generation)
-![Chikitsalya Interface](./local_host/public/images/interface.png)
+![Chikitsalya Interface](./backend/public/images/interface.png)
 - **Massive Database**: Indexed with over **16,000+ medical entries** (MedLine Plus MedQuad).
 - **FAISS Engine**: Lightning-fast vector search for evidence-based medical advice.
 - **Explainable Results**: Directly retrieves verified medical text to ground AI predictions in reality.
@@ -35,7 +35,7 @@ Using a high-accuracy **Random Forest Classifier**, Chikitsalya predicts potenti
 ### 🏥 Hospital & Pharmacy Connectivity
 - Automatically finds the nearest healthcare facilities for immediate referral and action.
 
-![Architecture](./local_host/public/images/architecture.png)
+![Architecture](./backend/public/images/architecture.png)
 
 ---
 
@@ -63,7 +63,7 @@ cd IIT_BHU_Pre_Zonals
 ### 2️⃣ Start AI Services (Python)
 Ensure Python 3.8+ is installed.
 ```bash
-cd local_host
+cd backend
 pip install -r requirements.txt
 python API.py
 ```
@@ -71,13 +71,20 @@ python API.py
 ### 3️⃣ Start Main Server (Node.js)
 In a separate terminal:
 ```bash
-cd local_host
+cd backend
 npm install
 npm start
 ```
 
 ### 4️⃣ Launch Platform
 Visit [http://localhost:3000](http://localhost:3000)
+
+### 🚀 Render Free Development
+This repository is now Render-ready with `render.yaml` at the project root.
+- `AI Chikitsalya Backend` uses `Dockerfile.backend`
+- `AI Chikitsalya Frontend` uses `Dockerfile.frontend`
+
+When deploying on Render, update `NEXT_PUBLIC_API_URL` and `CORS_ORIGINS` in the service environment variables to match the generated Render URLs.
 
 ---
 

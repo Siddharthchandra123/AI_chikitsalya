@@ -1,5 +1,6 @@
 "use client"
 
+import { useAuth } from "@/lib/auth-context"
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { 
@@ -17,8 +18,57 @@ import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 
 export default function SummaryPage() {
+  const { user } = useAuth()
   const [generating, setGenerating] = useState(false)
   const [showSeal, setShowSeal] = useState(true)
+  const [syncing, setSyncing] = useState(false)
+  const [syncStatus, setSyncStatus] = useState("Ready to sync with Medicare")
+  const [syncDetails, setSyncDetails] = useState("")
+  const patientId = user?.id ?? "PT-44221"
+  const patientName = user?.name ?? "Rahul Sharma"
+  const token = user?.token
+  const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
+
+  const handleSyncWithMedicare = async () => {
+    setSyncing(true)
+    setSyncStatus("Sending discharge data to Medicare...")
+    setSyncDetails("")
+
+    try {
+      const response = await fetch(`${apiBase}/medicare/discharge`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          patient_id: patientId,
+          patient_name: patientName,
+          summary_version: "v2",
+        }),
+      })
+
+      const result = await response.json()
+      if (!response.ok) {
+        throw new Error(result.error || "Medicare sync failed")
+      }
+
+      setSyncing(false)
+      setSyncStatus(result.status || "Medicare sync complete")
+      setSyncDetails(result.detail || "The summary has been forwarded and approved.")
+
+      toast.success("Medicare discharge synced", {
+        description: result.detail || "Discharge data shared with Medicare.",
+      })
+    } catch (error) {
+      setSyncing(false)
+      setSyncStatus("Medicare sync failed")
+      setSyncDetails("Please try again or contact support.")
+      toast.error("Unable to sync with Medicare", {
+        description: error instanceof Error ? error.message : "Unknown error",
+      })
+    }
+  }
 
   const handleGenerate = () => {
     setGenerating(true)
@@ -70,7 +120,7 @@ export default function SummaryPage() {
           <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-slate-900 dark:text-white">Discharge Summary</h1>
           <p className="text-muted-foreground font-medium">Certified clinical overview and instructions</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
           <Button variant="outline" className="rounded-2xl h-11 border-slate-200 dark:border-slate-800" onClick={handleShare}>
             <Share2 className="w-4 h-4 mr-2 text-primary" />
             Share
@@ -93,8 +143,22 @@ export default function SummaryPage() {
               </>
             )}
           </Button>
+          <Button
+            variant="secondary"
+            className="rounded-2xl h-11 shadow-lg shadow-primary/10"
+            onClick={handleSyncWithMedicare}
+            disabled={syncing}
+          >
+            {syncing ? "Syncing Medicare..." : "Send to Medicare"}
+          </Button>
         </div>
       </motion.div>
+
+      <div className="rounded-3xl border border-slate-200/80 bg-slate-50 dark:bg-slate-950 p-4 text-sm text-slate-700 dark:text-slate-300 mb-6">
+        <p className="font-semibold">Medicare discharge status</p>
+        <p className="mt-1">{syncStatus}</p>
+        {syncDetails ? <p className="mt-1 text-xs text-muted-foreground">{syncDetails}</p> : null}
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Document Preview */}

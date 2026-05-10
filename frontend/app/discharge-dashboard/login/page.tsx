@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
 import { Heart, ShieldCheck, ArrowRight, Loader2, Lock } from "lucide-react"
@@ -8,28 +8,82 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { toast } from "sonner"
+import { useAuth } from "@/lib/auth-context"
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false)
-  const [patientId, setPatientId] = useState("")
+  const [name, setName] = useState("")
+  const [mobile, setMobile] = useState("")
   const router = useRouter()
+  const { login, isAuthenticated } = useAuth()
 
-  const handleLogin = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace("/discharge-dashboard")
+    }
+  }, [isAuthenticated, router])
+
+  const validateMobile = (value: string) => {
+    return /^[6-9][0-9]{9}$/.test(value)
+  }
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!patientId) {
-      toast.error("Please enter your Patient ID")
+    const trimmedName = name.trim()
+    const trimmedMobile = mobile.trim()
+
+    if (!trimmedName || !trimmedMobile) {
+      toast.error("Please enter your name and mobile number.")
       return
     }
 
+    if (trimmedName.length < 3 || trimmedName.length > 50) {
+      toast.error("Name must be between 3 and 50 characters.")
+      return
+    }
+
+    if (!validateMobile(trimmedMobile)) {
+      toast.error("Enter a valid 10-digit mobile number starting with 6-9.")
+      return
+    }
+
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
     setLoading(true)
-    // Simulate authentication
-    setTimeout(() => {
-      setLoading(false)
+
+    try {
+      const response = await fetch(`${apiUrl}/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name: name.trim(), mobile: mobile.trim() }),
+      })
+
+      const result = await response.json()
+      if (!response.ok) {
+        toast.error(result.error || "Login failed")
+        setLoading(false)
+        return
+      }
+
+      login({
+        id: result.user?.id || mobile.trim(),
+        name: result.user?.name || name.trim(),
+        mobile: result.user?.mobile || mobile.trim(),
+        role: result.user?.role,
+        token: result.token,
+      })
+
       toast.success("Authentication successful", {
-        description: "Welcome back, Rahul Sharma",
+        description: `Welcome back, ${result.user?.name || name.trim()}`,
       })
       router.push("/discharge-dashboard")
-    }, 1500)
+    } catch (error) {
+      console.error(error)
+      toast.error("Unable to reach authentication service.")
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -55,7 +109,7 @@ export default function LoginPage() {
           <CardHeader className="space-y-1 text-center">
             <CardTitle className="text-2xl">Secure Login</CardTitle>
             <CardDescription>
-              Enter your Patient ID to access your records
+              Enter your name and mobile number to access your discharge dashboard securely.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -64,9 +118,19 @@ export default function LoginPage() {
                 <div className="relative">
                   <Input
                     type="text"
-                    placeholder="Patient ID (e.g. PT-44221)"
-                    value={patientId}
-                    onChange={(e) => setPatientId(e.target.value)}
+                    placeholder="Full name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="pl-10 h-12 border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-950/50"
+                  />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                </div>
+                <div className="relative">
+                  <Input
+                    type="tel"
+                    placeholder="Mobile number"
+                    value={mobile}
+                    onChange={(e) => setMobile(e.target.value)}
                     className="pl-10 h-12 border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-950/50"
                   />
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />

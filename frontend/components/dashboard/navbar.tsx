@@ -1,5 +1,6 @@
 "use client"
 
+import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { Search, Bell, Moon, Sun, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -14,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useTheme } from "@/components/theme-provider"
+import { useAuth } from "@/lib/auth-context"
 
 interface NavbarProps {
   onMenuClick: () => void
@@ -21,6 +23,15 @@ interface NavbarProps {
 
 export function Navbar({ onMenuClick }: NavbarProps) {
   const { theme, setTheme } = useTheme()
+  const { user, logout } = useAuth()
+  const router = useRouter()
+
+  const handleLogout = () => {
+    logout()
+    router.push("/discharge-dashboard/login")
+  }
+
+  const userName = user?.name || "Patient"
 
   return (
     <motion.header
@@ -78,23 +89,23 @@ export function Navbar({ onMenuClick }: NavbarProps) {
           <DropdownMenuTrigger asChild>
             <div className="flex items-center gap-3 pl-2 cursor-pointer">
               <div className="text-right hidden sm:block">
-                <p className="text-sm font-bold leading-none">Rahul Sharma</p>
+                <p className="text-sm font-bold leading-none">{userName}</p>
                 <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold tracking-tighter">Gold Member</p>
               </div>
               <Avatar className="h-10 w-10 border-2 border-primary/20 p-0.5">
-                <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=Rahul" />
-                <AvatarFallback>RS</AvatarFallback>
+                <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(userName)}`} />
+                <AvatarFallback>{userName.split(" ").map((part) => part[0]).join("").slice(0, 2).toUpperCase()}</AvatarFallback>
               </Avatar>
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Medical History</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => router.push("/discharge-dashboard/settings")}>Settings</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => router.push("/discharge-dashboard/summary")}>Discharge Summary</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => router.push("/discharge-dashboard/insurance")}>Insurance</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">
+            <DropdownMenuItem className="text-destructive" onSelect={handleLogout}>
               Sign Out
             </DropdownMenuItem>
           </DropdownMenuContent>

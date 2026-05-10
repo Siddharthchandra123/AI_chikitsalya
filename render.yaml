@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: AI Chikitsalya Backend
+    env: docker
+    dockerfilePath: Dockerfile.backend
+    branch: main
+    plan: free
+    envVars:
+      - key: PORT
+        value: "5000"
+      - key: CORS_ORIGINS
+        value: "https://ai-chikitsalya-frontend.onrender.com"
+      - key: VALID_API_KEYS
+        value: ""
+      - key: SECRET_KEY
+        value: "change-me-in-production"
+
+  - type: web
+    name: AI Chikitsalya Frontend
+    env: docker
+    dockerfilePath: Dockerfile.frontend
+    branch: main
+    plan: free
+    envVars:
+      - key: PORT
+        value: "3000"
+      - key: NEXT_PUBLIC_API_URL
+        value: "https://ai-chikitsalya-backend.onrender.com"

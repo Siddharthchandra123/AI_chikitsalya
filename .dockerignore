@@ -1,0 +1,15 @@
+node_modules
+.next
+.git
+.gitignore
+README.md
+*.md
+.env.example
+.env.local
+npm-debug.log
+pnpm-debug.log
+__pycache__
+*.pyc
+.pytest_cache
+.venv
+venv

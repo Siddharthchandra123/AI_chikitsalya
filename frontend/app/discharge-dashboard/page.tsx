@@ -1,5 +1,6 @@
 "use client"
 
+import { useAuth } from "@/lib/auth-context"
 import { motion } from "framer-motion"
 import { Plus, Heart, Sparkles, Activity, Clock, FileText, CheckCircle2 } from "lucide-react"
 import { DischargeReadiness } from "@/components/dashboard/discharge-readiness"
@@ -10,6 +11,9 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { toast } from "sonner"
 
 export default function DashboardPage() {
+  const { user } = useAuth()
+  const userName = user?.name || "Patient"
+
   return (
     <main className="p-4 lg:p-8 space-y-8 max-w-7xl mx-auto">
       {/* Header */}
@@ -20,7 +24,7 @@ export default function DashboardPage() {
       >
         <div className="space-y-1">
           <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-slate-900 dark:text-white">
-            Welcome back, <span className="text-primary">Rahul</span>
+            Welcome back, <span className="text-primary">{userName}</span>
           </h1>
           <p className="text-muted-foreground font-medium">
             Your discharge process is <span className="text-primary font-bold">80% complete</span>. Final steps pending.
