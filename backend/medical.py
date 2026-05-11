@@ -3,7 +3,6 @@ import faiss
 import numpy as np
 import joblib
 import os
-from sentence_transformers import SentenceTransformer
 
 # --- CONFIG & PATHS ---
 DATA_DIR = os.path.dirname(os.path.abspath(__file__))

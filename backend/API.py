@@ -5,7 +5,6 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from medical import ask
 from deep_translator import GoogleTranslator
-from vision.image_analyzer import ImageAnalyzer
 from security import (
     SecurityConfig, InputValidator, RateLimiter, 
     log_security_event, get_client_ip, rate_limiter,
@@ -78,7 +77,7 @@ def check_rate_limit():
 
 
 # Initialize services
-analyzer = ImageAnalyzer()
+# Vision module disabled for lightweight deployment
 
 # Create upload folder if it doesn't exist
 UPLOAD_FOLDER = SecurityConfig.UPLOAD_FOLDER
@@ -319,21 +318,15 @@ def analyze_image():
             'confidence': score
         })
         
-        return jsonify({
-            "prediction": label,
-            "confidence": float(score),
-            "timestamp": datetime.utcnow().isoformat()
-        }), 200
-    
-    except Exception as e:
-        logger.error(f"Image analysis error: {str(e)}")
-        log_security_event('IMAGE_ANALYSIS_ERROR', {
-            'ip': get_client_ip(request),
-            'error': str(e)
-        }, 'error')
-        return jsonify({
-            "error": "Image analysis failed"
-        }), 500
+@app.route("/analyze-image", methods=["POST"])
+def analyze_image():
+    """
+    Image analysis endpoint - disabled in lightweight deployment
+    """
+    return jsonify({
+        "error": "Image analysis is disabled in lightweight deployment mode",
+        "status": "unavailable"
+    }), 501
 
 
 @app.route('/predict', methods=['POST', 'OPTIONS'])
