@@ -1,14 +1,21 @@
-# Stage 1: Build
-FROM node:18-alpine AS build
+FROM node:20-alpine AS deps
 WORKDIR /app
-COPY package.json package-lock.json* pnpm-lock.yaml* ./
-RUN npm install -g pnpm && pnpm install
-COPY . .
-RUN pnpm run build
+COPY package.json package-lock.json* ./
+RUN npm ci
 
-# Stage 2: Run Next.js server
-FROM node:18-alpine
+FROM node:20-alpine AS builder
 WORKDIR /app
-COPY --from=build /app ./
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+ENV NEXT_TELEMETRY_DISABLED=1
+RUN npm run build
+
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
 EXPOSE 3000
-CMD ["npm", "run", "start"]
+CMD ["node","server.js"]

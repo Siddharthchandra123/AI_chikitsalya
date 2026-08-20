@@ -8,7 +8,8 @@ console.log("🚀 Server starting...");
 
 // ----------- CONFIG ----------- //
 const PORT = process.env.PORT || 3000;
-const PYTHON_API_URL = "http://127.0.0.1:5000";
+// Allow overriding backend URL via environment for Docker/CI deployments
+const PYTHON_API_URL = process.env.PYTHON_API_URL || "http://127.0.0.1:5000";
 
 // ----------- MIDDLEWARE ----------- //
 app.use(express.json());
@@ -70,7 +71,7 @@ app.post('/ask', async (req, res) => {
         res.json({ response: response.data.reply });
 
     } catch (error) {
-        console.error("❌ Error:", error.message);
+        console.error("❌ Error:", error && error.message ? error.message : error);
         if (error.response) {
             console.error("Backend returned:", error.response.data);
         }
@@ -78,6 +79,11 @@ app.post('/ask', async (req, res) => {
             response: `Error: Could not connect to AI backend. Reason: ${error.message}`
         });
     }
+});
+
+// Simple JSON health endpoint for orchestrators
+app.get('/health', (req, res) => {
+    res.json({ status: 'ok', python_api: PYTHON_API_URL });
 });
 
 // ----------- API ROUTES ----------- //
@@ -116,4 +122,4 @@ app.post('/api/add-pharmacy', (req, res) => {
 // ----------- START SERVER ----------- //
 app.listen(PORT, "0.0.0.0", () => {
     console.log(`✅ Server running on port ${PORT}`);
-});
+});

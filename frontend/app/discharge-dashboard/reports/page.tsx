@@ -52,14 +52,18 @@ const reports = [
 ]
 
 export default function ReportsPage() {
-  const handleDownload = (name: string) => {
-    toast.success(`Starting download: ${name}`, {
+  const handleDownload = (
+  reportId: string,
+  reportName: string
+) => {
+
+    toast.success(`Starting download: ${reportName}`, {
       description: "Your document will be ready in a few seconds.",
     })
   }
 
-  const handleView = (name: string) => {
-    toast.info(`Opening preview: ${name}`, {
+  const handleView = (reportId: string, reportName: string) => {
+    toast.info(`Opening preview: ${reportName}`, {
       description: "Loading high-resolution document viewer...",
     })
   }

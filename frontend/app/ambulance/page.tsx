@@ -9,6 +9,7 @@ import {
   Truck,
   Phone,
   MapPin,
+  CheckCircle2,
   Clock,
   AlertTriangle,
   Navigation as NavIcon,

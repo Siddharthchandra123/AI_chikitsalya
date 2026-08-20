@@ -129,3 +129,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* AI Chikitsalya design system */
+html { scroll-behavior: smooth; }
+body { min-height: 100vh; -webkit-font-smoothing: antialiased; }
+button, a, input, textarea, select { -webkit-tap-highlight-color: transparent; }
+::selection { background: color-mix(in oklab, var(--primary) 18%, transparent); }

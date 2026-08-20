@@ -116,15 +116,17 @@ export default function SettingsPage() {
                       <span className="text-sm font-medium">{item.name}</span>
                       {item.type === "switch" ? (
                         <Switch
-                          checked={item.value}
-                          onCheckedChange={(checked) => {
-                            if (item.onChange) {
-                              item.onChange()
-                            }
-                            toast.success(`${item.name} updated`, {
-                              description: `${item.name} is now ${checked ? 'enabled' : 'disabled'}.`
-                            })
-                          }}
+  checked={item.value}
+  onCheckedChange={(checked) => {
+    if ("onChange" in item && item.onChange) {
+      item.onChange()
+    }
+
+    toast.success(`${item.name} updated`, {
+      description: checked ? "Enabled" : "Disabled",
+    })
+  }}
+
                         />
                       ) : (
                         <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />

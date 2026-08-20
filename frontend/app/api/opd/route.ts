@@ -2,7 +2,18 @@ import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 
-const DB_PATH = path.join(process.cwd(), 'opd_bookings.json');
+const DATA_DIR = process.env.DATA_DIR || path.join(process.cwd(), "data");
+const DB_PATH = path.join(DATA_DIR, "opd_bookings.json");
+
+function readBookings() {
+    if (!fs.existsSync(DB_PATH)) return [];
+    return JSON.parse(fs.readFileSync(DB_PATH, "utf8"));
+}
+
+function writeBookings(bookings: any[]) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    fs.writeFileSync(DB_PATH, JSON.stringify(bookings, null, 2));
+}
 
 export async function GET() {
     try {
@@ -20,11 +31,7 @@ export async function POST(request: Request) {
     try {
         const booking = await request.json();
         
-        let bookings = [];
-        if (fs.existsSync(DB_PATH)) {
-            const data = fs.readFileSync(DB_PATH, 'utf8');
-            bookings = JSON.parse(data);
-        }
+        const bookings = readBookings();
 
         // Add a unique booking ID and timestamp
         const newBooking = {
@@ -35,7 +42,7 @@ export async function POST(request: Request) {
         };
 
         bookings.push(newBooking);
-        fs.writeFileSync(DB_PATH, JSON.stringify(bookings, null, 2));
+        writeBookings(bookings);
 
         return NextResponse.json({ success: true, booking: newBooking });
     } catch (error) {
@@ -48,14 +55,13 @@ export async function PATCH(request: Request) {
         const { id, status } = await request.json();
         if (!fs.existsSync(DB_PATH)) return NextResponse.json({ error: "No bookings found" }, { status: 404 });
 
-        const data = fs.readFileSync(DB_PATH, 'utf8');
-        let bookings = JSON.parse(data);
+        let bookings = readBookings();
         
         const index = bookings.findIndex((b: any) => b.id === id);
         if (index === -1) return NextResponse.json({ error: "Booking not found" }, { status: 404 });
 
         bookings[index].status = status;
-        fs.writeFileSync(DB_PATH, JSON.stringify(bookings, null, 2));
+        writeBookings(bookings);
 
         return NextResponse.json({ success: true });
     } catch (error) {
